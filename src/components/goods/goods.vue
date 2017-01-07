@@ -30,7 +30,7 @@
                                     <span v-show="foods.oldPrice" class="old-price">¥{{foods.oldPrice}}</span>
                                 </div>
                                 <div class="cartcontrol-wrapper">
-                                    <cartcontrol :food="foods"></cartcontrol>
+                                    <cartcontrol :food="foods" v-on:addcart="_drop"></cartcontrol>
                                 </div>
                             </div>
                         </li>
@@ -38,7 +38,7 @@
                 </li>
             </ul>
         </div>
-        <shopcart :selectedGoods="selectedFoods" :deliveryPrice="seller.deliveryPrice" :minPrice="seller.minPrice"></shopcart>
+        <shopcart ref="shopcart" :selectedGoods="selectedFoods" :deliveryPrice="seller.deliveryPrice" :minPrice="seller.minPrice"></shopcart>
     </div>
 </template>
 <script>
@@ -108,6 +108,12 @@ export default {
             });
             this.foodsWrapper.on('scroll', (pos) => {
                 this.scrollY = Math.abs(Math.round(pos.y));
+            });
+        },
+        _drop(target) {
+            /** 优化小球下落动画 **/
+            this.$nextTick(() => {
+                this.$refs.shopcart.drop(target);
             });
         },
         _calculateHeight() {

@@ -29,6 +29,7 @@ export default {
             } else {
                 this.food.count++;
             }
+            this.$emit('addcart', event.target);
         },
         decreaseCart(event) {
             if (!event._constructed) {
@@ -63,7 +64,7 @@ export default {
     }
     .move-enter{
         opacity: 0;
-        transform: translate3D(24px, 0, 0);
+        transform: translate3d(24px, 0, 0);
         .inner{
             transform: rotate(180deg);
         }
@@ -83,7 +84,7 @@ export default {
     .move-leave-active{
         transition: all .3s linear;
         opacity: 0;
-        transform: translate3D(24px, 0, 0);
+        transform: translate3d(24px, 0, 0);
         .inner{
             transition: all .3s linear;
             transform: rotate(180deg);
