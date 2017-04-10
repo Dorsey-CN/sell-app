@@ -32,20 +32,40 @@
                 <split></split>
                 <div class="food-ratings">
                     <h1 class="title">商品评价</h1>
-                    <ratingselect :ratings="food.ratings" :rating-type="ratingType" :only-content="onlyContent" :desc="desc"></ratingselect>
+                    <ratingselect :ratings="food.ratings" :rating-type="ratingType" :only-content="onlyContent" :desc="desc" v-on:change-type="setRatingType" v-on:change-content="setOnlyContent"></ratingselect>
+                    <div class="ratings-wrapper">
+                        <ul class="rating-list" v-show="food.ratings && food.ratings.length">
+                            <li class="rating-item border-1px" v-for="rating in food.ratings" v-show="needShow(rating.rateType, rating.text)">
+                                <div class="user-info">
+                                    <span class="user-name">{{rating.username}}</span>
+                                    <img class="user-avatar" :src="rating.avatar" width="12" height="12" />
+                                </div>
+                                <span class="rating-time">{{rating.rateTime | formatDate}}</span>
+                                <p class="rating-content">
+                                    <span class="rating-icon" :class="{'icon-thumb_up': rating.rateType === 0, 'icon-thumb_down': rating.rateType === 1}"></span>
+                                    <span class="rating-text">{{rating.text}}</span>
+                                </p>
+                            </li>
+                        </ul>
+                        <div class="no-ratings" v-show="!food.ratings || !food.ratings.length">
+                            该商品暂无评价信息！
+                        </div>
+                    </div>
                 </div>
-            </div </div>
+            </div>
+        </div>
     </transition>
 </template>
 <script>
 import Vue from 'vue';
 import BScroll from 'better-scroll';
+import {
+    formDate
+} from 'common/js/formate_date.js';
 import cartcontrol from 'components/controlcart/controlcart.vue';
 import split from 'components/split/split.vue';
 import ratingselect from 'components/ratingselect/ratingselect.vue';
 
-// const POSITIVE = 0;
-// const NEGATIVE = 1;
 const ALL = 2;
 
 export default {
@@ -98,6 +118,35 @@ export default {
         },
         _todrop(target) {
             this.$emit('addcart', target);
+        },
+        setRatingType(type) {
+            this.ratingType = type;
+            this.$nextTick(() => {
+                this.scroll.refresh();
+            });
+        },
+        setOnlyContent(content) {
+            this.onlyContent = content;
+            this.$nextTick(() => {
+                this.scroll.refresh();
+            });
+        },
+        needShow(type, text) {
+            if (this.onlyContent && !text) {
+                return false;
+            }
+
+            if (this.ratingType === ALL) {
+                return true;
+            } else {
+                return this.ratingType === type;
+            }
+        }
+    },
+    filters: {
+        formatDate(time) {
+            let date = new Date(time);
+            return formDate(date, 'yyyy-MM-dd hh:mm');
         }
     },
     components: {
@@ -108,6 +157,7 @@ export default {
 };
 </script>
 <style lang="scss" rel="stylesheet/sass" scoped>
+@import '../../common/sass/mixin.scss';
 .food {
     position: fixed;
     top: 0;
@@ -222,13 +272,61 @@ export default {
             color: rgb(147, 153, 159);
         }
     }
-    .food-ratings{
+    .food-ratings {
         padding-top: 18px;
-        .title{
+        .title {
             line-height: 14px;
             margin-left: 18px;
             font-size: 14px;
             color: rgb(7, 17, 27);
+        }
+        .ratings-wrapper {
+            padding: 0 18px;
+            .rating-item {
+                position: relative;
+                padding: 16px;
+                @include border-1px(rgba(7, 17, 27, 0.1));
+                .user-info {
+                    position: absolute;
+                    right: 0;
+                    top: 16px;
+                    font-size: 0;
+                    .user-name {
+                        display: inline-block;
+                        margin-right: 6px;
+                        line-height: 12px;
+                        vertical-align: top;
+                        color: rgb(147, 153, 159);
+                        font-size: 10px;
+                    }
+                }
+                .rating-time {
+                    margin-bottom: 6px;
+                    line-height: 12px;
+                    font-size: 10px;
+                    color: rgb(147, 153, 159);
+                }
+                .rating-content {
+                    line-height: 16px;
+                    font-size: 12px;
+                    color: rgb(7, 17, 27);
+                    .rating-icon {
+                        line-height: 16px;
+                        font-size: 12px;
+                    }
+                    .icon-thumb_up {
+                        color: rgb(0, 160, 220);
+                    }
+                    .icon-thumb_down {
+                        color: rgb(147, 153, 159);
+                    }
+                }
+            }
+            .no-ratings {
+                padding: 16px 0;
+                font-size: 12px;
+                color: rgb(147, 153, 159);
+            }
         }
     }
 }
