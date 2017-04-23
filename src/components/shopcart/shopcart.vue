@@ -175,7 +175,7 @@ export default {
                 }
             }
         },
-        enter(el) {
+        enter(el, done) {
             /* eslint-disable no-unused-vars */
             let refresh = el.offsetHeight;
             this.$nextTick(() => {
@@ -184,6 +184,7 @@ export default {
                 let inner = el.getElementsByClassName('inner-hook')[0];
                 inner.style.webkitTransform = 'translate3d(0, 0, 0)';
                 inner.style.transform = 'translate3d(0, 0, 0)';
+                el.addEventListener('transitionend', done);
             });
         },
         afterEnter(el) {
